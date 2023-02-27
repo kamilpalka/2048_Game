@@ -1,19 +1,15 @@
 import Phaser from "phaser";
 
-import HelloWorldScene from "./scenes/HelloWorldScene";
+import PlayGame from "./scenes/PlayGame";
+import Preload from "./scenes/Preload";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: "app",
-  width: 800,
+  width: 480,
   height: 640,
-  physics: {
-    default: "arcade",
-    arcade: {
-      gravity: { y: 200 },
-    },
-  },
-  scene: [HelloWorldScene],
+  backgroundColor: 0xff0000,
+  scene: [Preload, PlayGame],
 };
 
 export default new Phaser.Game(config);
