@@ -6,9 +6,9 @@ import Preload from "./scenes/Preload";
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: "app",
-  width: 480,
-  height: 640,
-  backgroundColor: 0xff0000,
+  width: 900,
+  height: 900,
+  backgroundColor: 0xecf0f1,
   scene: [Preload, PlayGame],
 };
 

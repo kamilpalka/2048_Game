@@ -5,8 +5,11 @@ export default class Preload extends Phaser.Scene {
     super("preload");
   }
 
+  preload() {
+    this.load.image("emptytile", "./assets/emptytile.png");
+  }
+
   create() {
-    console.log("zaczynamy");
     this.scene.start("play-game");
   }
 }
