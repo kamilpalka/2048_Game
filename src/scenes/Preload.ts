@@ -2,7 +2,7 @@ import Phaser from "phaser";
 
 import gameOptions from "../gameOptions";
 
-const { tileSize, tileSpacing, boardSize } = gameOptions;
+const { tileSize } = gameOptions;
 
 export default class Preload extends Phaser.Scene {
   constructor() {

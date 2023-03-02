@@ -1,16 +1,18 @@
 import Phaser from "phaser";
 import gameOptions from "../gameOptions";
 
-const { tileSize, tileSpacing, boardSize } = gameOptions;
+const { tileSize, tileSpacing, boardSize, tweenSpeed } = gameOptions;
 
 export default class PlayGame extends Phaser.Scene {
   private boardArray: any[][] = [];
+  private canMove = false;
 
   constructor() {
     super("play-game");
   }
 
   create() {
+    this.canMove = false;
     for (let i = 0; i < boardSize.rows; i++) {
       this.boardArray[i] = [];
       for (let j = 0; j < boardSize.cols; j++) {
@@ -31,6 +33,19 @@ export default class PlayGame extends Phaser.Scene {
     }
     this.addTile();
     this.addTile();
+
+    this.input.keyboard.on("keydown", this.handleKey, this);
+    this.input.on("pointerup", this.handleSwipe, this);
+  }
+
+  handleKey(e: KeyboardEvent) {
+    const keyPressed = e.code;
+    console.log(keyPressed);
+  }
+
+  handleSwipe(e: Phaser.Input.Pointer) {
+    const swipeTime = e.upTime - e.downTime;
+    const swipe = new Phaser.Geom.Point(e.upX - e.downX, e.upY - e.downY);
   }
 
   getTilePosition(row: number, col: number) {
@@ -56,6 +71,16 @@ export default class PlayGame extends Phaser.Scene {
       this.boardArray[chosenTile.row][chosenTile.col].tileValue = 1;
       this.boardArray[chosenTile.row][chosenTile.col].tileSprite.visible = true;
       this.boardArray[chosenTile.row][chosenTile.col].tileSprite.setFrame(0);
+      this.boardArray[chosenTile.row][chosenTile.col].tileSprite.alpha = 0;
+      this.tweens.add({
+        targets: [this.boardArray[chosenTile.row][chosenTile.col].tileSprite],
+        alpha: 1,
+        duration: tweenSpeed,
+        callbackScope: this,
+        onComplete: () => {
+          this.canMove = true;
+        },
+      });
     }
   }
 }
