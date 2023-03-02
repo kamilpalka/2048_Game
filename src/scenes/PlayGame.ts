@@ -1,7 +1,22 @@
 import Phaser from "phaser";
 import gameOptions from "../gameOptions";
 
-const { tileSize, tileSpacing, boardSize, tweenSpeed } = gameOptions;
+const {
+  tileSize,
+  tileSpacing,
+  boardSize,
+  tweenSpeed,
+  swipeMaxTime,
+  swipeMinDistance,
+  swipeMinNormal,
+} = gameOptions;
+
+enum Directions {
+  LEFT = 0,
+  RIGHT = 1,
+  UP = 2,
+  DOWN = 3,
+}
 
 export default class PlayGame extends Phaser.Scene {
   private boardArray: any[][] = [];
@@ -39,13 +54,55 @@ export default class PlayGame extends Phaser.Scene {
   }
 
   handleKey(e: KeyboardEvent) {
-    const keyPressed = e.code;
-    console.log(keyPressed);
+    if (this.canMove) {
+      switch (e.code) {
+        case "KeyA":
+        case "ArrowLeft":
+          this.makeMove(Directions.LEFT);
+          break;
+        case "KeyD":
+        case "ArrowRight":
+          this.makeMove(Directions.RIGHT);
+          break;
+        case "KeyW":
+        case "ArrowUp":
+          this.makeMove(Directions.UP);
+          break;
+        case "KeyS":
+        case "ArrowDown":
+          this.makeMove(Directions.DOWN);
+          break;
+      }
+    }
+  }
+
+  makeMove(input: number) {
+    console.log("ruszam " + Number(input));
   }
 
   handleSwipe(e: Phaser.Input.Pointer) {
-    const swipeTime = e.upTime - e.downTime;
-    const swipe = new Phaser.Geom.Point(e.upX - e.downX, e.upY - e.downY);
+    if (this.canMove) {
+      const swipeTime = e.upTime - e.downTime;
+      const fastEnough = swipeTime < swipeMaxTime;
+      const swipe = new Phaser.Geom.Point(e.upX - e.downX, e.upY - e.downY);
+      const swipeMagnitude = Phaser.Geom.Point.GetMagnitude(swipe);
+      const longEnough = swipeMagnitude > swipeMinDistance;
+      if (longEnough && fastEnough) {
+        Phaser.Geom.Point.SetMagnitude(swipe, 1);
+        if (swipe.x > swipeMinNormal) {
+          this.makeMove(Directions.RIGHT);
+        }
+        if (swipe.x < -swipeMinNormal) {
+          this.makeMove(Directions.LEFT);
+        }
+        if (swipe.y > swipeMinNormal) {
+          this.makeMove(Directions.DOWN);
+        }
+        if (swipe.y < -swipeMinNormal) {
+          this.makeMove(Directions.UP);
+        }
+      }
+    }
   }
 
   getTilePosition(row: number, col: number) {
