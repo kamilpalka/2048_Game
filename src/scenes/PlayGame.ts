@@ -76,8 +76,32 @@ export default class PlayGame extends Phaser.Scene {
     }
   }
 
-  makeMove(input: number) {
-    console.log("ruszam " + Number(input));
+  makeMove(d: number) {
+    const dRow =
+      d == Directions.LEFT || d == Directions.RIGHT
+        ? 0
+        : d == Directions.UP
+        ? -1
+        : 1;
+    const dCol =
+      d == Directions.UP || d == Directions.DOWN
+        ? 0
+        : d == Directions.LEFT
+        ? -1
+        : 1;
+    this.canMove = false;
+    for (let i = 0; i < boardSize.rows; i++) {
+      for (let j = 0; j < boardSize.cols; j++) {
+        const curRow = dRow == 1 ? boardSize.rows - 1 - i : i;
+        const curCol = dCol == 1 ? boardSize.cols - 1 - j : j;
+        const tileValue = this.boardArray[curRow][curCol].tileValue;
+        if (tileValue != 0) {
+          const newPos = this.getTilePosition(curRow + dRow, curCol + dCol);
+          this.boardArray[curRow][curCol].tileSprite.x = newPos.x;
+          this.boardArray[curRow][curCol].tileSprite.y = newPos.y;
+        }
+      }
+    }
   }
 
   handleSwipe(e: Phaser.Input.Pointer) {

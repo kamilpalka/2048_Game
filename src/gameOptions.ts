@@ -5,7 +5,7 @@ const gameOptions = {
     rows: 4,
     cols: 4,
   },
-  tweenSpeed: 2000,
+  tweenSpeed: 200,
   swipeMaxTime: 1000,
   swipeMinDistance: 20,
   swipeMinNormal: 0.85,
