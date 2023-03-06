@@ -90,12 +90,17 @@ export default class PlayGame extends Phaser.Scene {
         ? -1
         : 1;
     this.canMove = false;
+    let movedTiles = 0;
     for (let i = 0; i < boardSize.rows; i++) {
       for (let j = 0; j < boardSize.cols; j++) {
         const curRow = dRow == 1 ? boardSize.rows - 1 - i : i;
         const curCol = dCol == 1 ? boardSize.cols - 1 - j : j;
         const tileValue = this.boardArray[curRow][curCol].tileValue;
         if (tileValue != 0) {
+          movedTiles++;
+          // Phaser.GameObjects.Components.Depth
+          // making tiles with higher z-index render on scene
+          this.boardArray[curRow][curCol].tileSprite.depth = movedTiles;
           const newPos = this.getTilePosition(curRow + dRow, curCol + dCol);
           this.boardArray[curRow][curCol].tileSprite.x = newPos.x;
           this.boardArray[curRow][curCol].tileSprite.y = newPos.y;
