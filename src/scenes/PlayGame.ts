@@ -91,10 +91,14 @@ export default class PlayGame extends Phaser.Scene {
         : 1;
     this.canMove = false;
     let movedTiles = 0;
-    for (let i = 0; i < boardSize.rows; i++) {
-      for (let j = 0; j < boardSize.cols; j++) {
-        const curRow = dRow == 1 ? boardSize.rows - 1 - i : i;
-        const curCol = dCol == 1 ? boardSize.cols - 1 - j : j;
+    const firstRow = d == Directions.UP ? 1 : 0;
+    const lastRow = boardSize.rows - (d == Directions.DOWN ? 1 : 0);
+    const firstCol = d == Directions.LEFT ? 1 : 0;
+    const lastCol = boardSize.cols - (d == Directions.RIGHT ? 1 : 0);
+    for (let i = firstRow; i < lastRow; i++) {
+      for (let j = firstCol; j < lastCol; j++) {
+        const curRow = dRow == 1 ? lastRow - 1 - i : i;
+        const curCol = dCol == 1 ? lastCol - 1 - j : j;
         const tileValue = this.boardArray[curRow][curCol].tileValue;
         if (tileValue != 0) {
           movedTiles++;
