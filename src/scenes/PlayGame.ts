@@ -101,16 +101,28 @@ export default class PlayGame extends Phaser.Scene {
         const curCol = dCol == 1 ? lastCol - 1 - j : j;
         const tileValue = this.boardArray[curRow][curCol].tileValue;
         if (tileValue != 0) {
+          let newRow = curRow;
+          let newCol = curCol;
+          while (this.isLegalPosition(newRow + dRow, newCol + dCol)) {
+            newRow += dRow;
+            newCol += dCol;
+          }
           movedTiles++;
           // Phaser.GameObjects.Components.Depth
           // making tiles with higher z-index render on scene
           this.boardArray[curRow][curCol].tileSprite.depth = movedTiles;
-          const newPos = this.getTilePosition(curRow + dRow, curCol + dCol);
+          const newPos = this.getTilePosition(newRow, newCol);
           this.boardArray[curRow][curCol].tileSprite.x = newPos.x;
           this.boardArray[curRow][curCol].tileSprite.y = newPos.y;
         }
       }
     }
+  }
+
+  isLegalPosition(row: number, col: number) {
+    const rowInside = row >= 0 && row < boardSize.rows;
+    const colInside = col >= 0 && col < boardSize.cols;
+    return rowInside && colInside;
   }
 
   handleSwipe(e: Phaser.Input.Pointer) {
