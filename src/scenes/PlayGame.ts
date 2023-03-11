@@ -114,9 +114,35 @@ export default class PlayGame extends Phaser.Scene {
           const newPos = this.getTilePosition(newRow, newCol);
           this.boardArray[curRow][curCol].tileSprite.x = newPos.x;
           this.boardArray[curRow][curCol].tileSprite.y = newPos.y;
+          this.boardArray[curRow][curCol].tileValue = 0;
+          if (this.boardArray[newRow][newCol].tileValue == tileValue) {
+            this.boardArray[newRow][newCol].tileValue++;
+            this.boardArray[curRow][curCol].tileSprite.setFrame(tileValue);
+          } else {
+            this.boardArray[newRow][newCol].tileValue = tileValue;
+          }
         }
       }
     }
+    this.refreshBoard();
+  }
+
+  refreshBoard() {
+    for (let i = 0; i < boardSize.rows; i++) {
+      for (let j = 0; j < boardSize.cols; j++) {
+        const spritePosition = this.getTilePosition(i, j);
+        this.boardArray[i][j].tileSprite.x = spritePosition.x;
+        this.boardArray[i][j].tileSprite.y = spritePosition.y;
+        const tileValue = this.boardArray[i][j].tileValue;
+        if (tileValue > 0) {
+          this.boardArray[i][j].tileSprite.visible = true;
+          this.boardArray[i][j].tileSprite.setFrame(tileValue - 1);
+        } else {
+          this.boardArray[i][j].tileSprite.visible = false;
+        }
+      }
+    }
+    this.addTile();
   }
 
   isLegalPosition(row: number, col: number) {
