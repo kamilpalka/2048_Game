@@ -103,7 +103,9 @@ export default class PlayGame extends Phaser.Scene {
         if (tileValue != 0) {
           let newRow = curRow;
           let newCol = curCol;
-          while (this.isLegalPosition(newRow + dRow, newCol + dCol)) {
+          while (
+            this.isLegalPosition(newRow + dRow, newCol + dCol, tileValue)
+          ) {
             newRow += dRow;
             newCol += dCol;
           }
@@ -145,10 +147,15 @@ export default class PlayGame extends Phaser.Scene {
     this.addTile();
   }
 
-  isLegalPosition(row: number, col: number) {
+  isLegalPosition(row: number, col: number, value: number) {
     const rowInside = row >= 0 && row < boardSize.rows;
     const colInside = col >= 0 && col < boardSize.cols;
-    return rowInside && colInside;
+    if (!rowInside || !colInside) {
+      return false;
+    }
+    const emptySpot = this.boardArray[row][col].tileValue == 0;
+    const sameValue = this.boardArray[row][col].tileValue == value;
+    return emptySpot || sameValue;
   }
 
   handleSwipe(e: Phaser.Input.Pointer) {
