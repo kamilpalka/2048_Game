@@ -169,14 +169,18 @@ export default class PlayGame extends Phaser.Scene {
         if (upgrade) {
           this.upgradeTile(tile);
         } else {
-          this.movingTiles--;
-          tile.depth = 0;
-          if (this.movingTiles == 0) {
-            this.refreshBoard();
-          }
+          this.endTween(tile);
         }
       },
     });
+  }
+
+  endTween(tile: Phaser.GameObjects.Sprite) {
+    this.movingTiles--;
+    tile.depth = 0;
+    if (this.movingTiles == 0) {
+      this.refreshBoard();
+    }
   }
 
   upgradeTile(tile: Phaser.GameObjects.Sprite) {
@@ -190,11 +194,7 @@ export default class PlayGame extends Phaser.Scene {
       repeat: 1,
       callbackScope: this,
       onComplete: () => {
-        this.movingTiles--;
-        tile.depth = 0;
-        if (this.movingTiles == 0) {
-          this.refreshBoard();
-        }
+        this.endTween(tile);
       },
     });
   }
