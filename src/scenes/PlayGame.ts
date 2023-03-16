@@ -21,6 +21,7 @@ enum Directions {
 export default class PlayGame extends Phaser.Scene {
   private boardArray: any[][] = [];
   private canMove = false;
+  private movingTiles: number = 0;
 
   constructor() {
     super("play-game");
@@ -78,6 +79,7 @@ export default class PlayGame extends Phaser.Scene {
   }
 
   makeMove(d: number) {
+    this.movingTiles = 0;
     const dRow =
       d == Directions.LEFT || d == Directions.RIGHT
         ? 0
@@ -91,12 +93,12 @@ export default class PlayGame extends Phaser.Scene {
         ? -1
         : 1;
     this.canMove = false;
-    let movedTiles = 0;
+    // let movedTiles = 0;
     const firstRow = d == Directions.UP ? 1 : 0;
     const lastRow = boardSize.rows - (d == Directions.DOWN ? 1 : 0);
     const firstCol = d == Directions.LEFT ? 1 : 0;
     const lastCol = boardSize.cols - (d == Directions.RIGHT ? 1 : 0);
-    let moveSomething = false;
+    // let moveSomething = false;
     for (let i = firstRow; i < lastRow; i++) {
       for (let j = firstCol; j < lastCol; j++) {
         const curRow = dRow == 1 ? lastRow - 1 - i : i;
@@ -111,20 +113,27 @@ export default class PlayGame extends Phaser.Scene {
             newRow += dRow;
             newCol += dCol;
           }
-          movedTiles++;
+          //movedTiles++;
           if (newRow != curRow || newCol != curCol) {
-            moveSomething = true;
+            //moveSomething = true;
             // Phaser.GameObjects.Components.Depth
             // making tiles with higher z-index render on scene
-            this.boardArray[curRow][curCol].tileSprite.depth = movedTiles;
+            //this.boardArray[curRow][curCol].tileSprite.depth = movedTiles;
             const newPos = this.getTilePosition(newRow, newCol);
-            this.boardArray[curRow][curCol].tileSprite.x = newPos.x;
-            this.boardArray[curRow][curCol].tileSprite.y = newPos.y;
+            const willUpdate =
+              this.boardArray[newRow][newCol].tileValue == tileValue;
+            //this.boardArray[curRow][curCol].tileSprite.x = newPos.x;
+            //this.boardArray[curRow][curCol].tileSprite.y = newPos.y;
+            this.moveTile(
+              this.boardArray[curRow][curCol].tileSprite,
+              newPos,
+              willUpdate
+            );
             this.boardArray[curRow][curCol].tileValue = 0;
-            if (this.boardArray[newRow][newCol].tileValue == tileValue) {
+            if (willUpdate) {
               this.boardArray[newRow][newCol].tileValue++;
               this.boardArray[newRow][newCol].upgraded = true;
-              this.boardArray[curRow][curCol].tileSprite.setFrame(tileValue);
+              //this.boardArray[curRow][curCol].tileSprite.setFrame(tileValue);
             } else {
               this.boardArray[newRow][newCol].tileValue = tileValue;
             }
@@ -132,11 +141,62 @@ export default class PlayGame extends Phaser.Scene {
         }
       }
     }
-    if (moveSomething) {
-      this.refreshBoard();
-    } else {
+    // if (moveSomething) {
+    //   this.refreshBoard();
+    // } else {
+    //   this.canMove = true;
+    // }
+    if (this.movingTiles == 0) {
       this.canMove = true;
     }
+  }
+
+  moveTile(
+    tile: Phaser.GameObjects.Sprite,
+    point: Phaser.Geom.Point,
+    upgrade: boolean
+  ) {
+    this.movingTiles++;
+    tile.depth = this.movingTiles;
+    const distance = Math.abs(tile.x - point.x) + Math.abs(tile.y + point.y);
+    this.tweens.add({
+      targets: [tile],
+      x: point.x,
+      y: point.y,
+      duration: (tweenSpeed * distance) / tileSize,
+      callbackScope: this,
+      onComplete: () => {
+        if (upgrade) {
+          this.upgradeTile(tile);
+        } else {
+          this.movingTiles--;
+          tile.depth = 0;
+          if (this.movingTiles == 0) {
+            this.refreshBoard();
+          }
+        }
+      },
+    });
+  }
+
+  upgradeTile(tile: Phaser.GameObjects.Sprite) {
+    tile.setFrame(tile.frame.name + 1);
+    this.tweens.add({
+      targets: [tile],
+      scaleX: 1.1,
+      scaleY: 1.1,
+      duration: tweenSpeed,
+      yoyo: true,
+      repeat: 1,
+      callbackScope: this,
+      onComplete: () => {
+        this.movingTiles--;
+        tile.depth = 0;
+        if (this.movingTiles == 0) {
+          this.refreshBoard();
+        }
+      },
+    });
   }
 
   refreshBoard() {
