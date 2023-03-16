@@ -23,9 +23,7 @@ export default class PlayGame extends Phaser.Scene {
   private canMove = false;
   private movingTiles: number = 0;
   private moveSound: any;
-
-  //private moveSound = this.sound.add("move");
-  //private growSound = this.sound.add("grow");
+  private growSound: any;
 
   constructor() {
     super("play-game");
@@ -58,6 +56,7 @@ export default class PlayGame extends Phaser.Scene {
     this.input.keyboard.on("keydown", this.handleKey, this);
     this.input.on("pointerup", this.handleSwipe, this);
     this.moveSound = this.sound.add("move");
+    this.growSound = this.sound.add("grow");
   }
 
   handleKey(e: KeyboardEvent) {
@@ -191,6 +190,7 @@ export default class PlayGame extends Phaser.Scene {
   }
 
   upgradeTile(tile: Phaser.GameObjects.Sprite) {
+    this.growSound.play();
     tile.setFrame(tile.frame.name + 1);
     this.tweens.add({
       targets: [tile],
